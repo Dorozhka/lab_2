@@ -5,30 +5,17 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.springframework.stereotype.Component;
 import zadorozhko.typesofreactors.manipulation.Reactor;
 
+@Component("XMLReader")
 public class XMLReader implements Reader {
-
     @Override
-    public Map<String, Reactor> read(String fileName) {
-        XmlMapper objectMapper = new XmlMapper();
-        
-        Map<String, Reactor> map = null;
-        try {
-            map = objectMapper.readValue(new File(fileName), new TypeReference<>() {
-            });
-            for (Map.Entry<String, Reactor> entry : map.entrySet()) {
-                entry.getValue().setSource(fileName);
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(XMLReader.class.getName()).log(Level.SEVERE, null, ex);
-        }
-            
-
-
+    public Map<String, Reactor> read(String fileName) throws IOException {
+        Map<String, Reactor> map;
+        XmlMapper mapper = new XmlMapper();
+        map = mapper.readValue(new File(fileName), new TypeReference<>() {
+        });
         return map;
     }
-
 }

@@ -50,7 +50,7 @@
       <life_time>60</life_time>
       <termal_capacity>2343</termal_capacity>
    </CANDU>
-   <CPR_1000>
+   <CPR-1000>
       <burnup>52.0</burnup>
       <class>CPR-1000</class>
       <electrical_capacity>1021</electrical_capacity>
@@ -59,7 +59,7 @@
       <kpd>35.1</kpd>
       <life_time>40</life_time>
       <termal_capacity>2900</termal_capacity>
-   </CPR_1000>
+   </CPR-1000>
    <EPR>
       <burnup>36.1</burnup>
       <class>EPR</class>
@@ -70,7 +70,7 @@
       <life_time>60</life_time>
       <termal_capacity>3992</termal_capacity>
    </EPR>
-   <KLT_40>
+   <KLT-40>
       <burnup>42</burnup>
       <class>KLT-40</class>
       <electrical_capacity>32</electrical_capacity>
@@ -79,7 +79,7 @@
       <kpd>0.3</kpd>
       <life_time>36</life_time>
       <termal_capacity>150</termal_capacity>
-   </KLT_40>
+   </KLT-40>
    <MAGNOX>
       <burnup>4.5</burnup>
       <class>MAGNOX</class>
@@ -120,7 +120,7 @@
       <life_time>50</life_time>
       <termal_capacity>3411</termal_capacity>
    </PWR>
-   <PWR_TEST>
+   <PWR-TEST>
       <burnup>40</burnup>
       <class>PWR</class>
       <electrical_capacity>1056</electrical_capacity>
@@ -129,7 +129,7 @@
       <kpd>0.33</kpd>
       <life_time>60</life_time>
       <termal_capacity>3200</termal_capacity>
-   </PWR_TEST>
+   </PWR-TEST>
    <RBMK>
       <burnup>25</burnup>
       <class>RBMK</class>
@@ -140,7 +140,7 @@
       <life_time>40</life_time>
       <termal_capacity>3200</termal_capacity>
    </RBMK>
-   <VVER_1000>
+   <VVER-1000>
       <burnup>40</burnup>
       <class>VVER-1200</class>
       <electrical_capacity>1056</electrical_capacity>
@@ -149,5 +149,5 @@
       <kpd>0.33</kpd>
       <life_time>60</life_time>
       <termal_capacity>3200</termal_capacity>
-   </VVER_1000>
+   </VVER-1000>
 </root>

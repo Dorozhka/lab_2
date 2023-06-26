@@ -1,26 +1,30 @@
 package zadorozhko.typesofreactors.importers;
 
+import java.io.IOException;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import zadorozhko.typesofreactors.manipulation.Reactor;
 
-
+@Component
 public class ImporterBuilder {
-    private Importer xml;
-    private Importer yaml;
-    private Importer json;
+    private final Importer xml;
+    private final Importer yaml;
+    private final Importer json;
 
-    public Map<String, Reactor> getData(String path) {
-        this.xml = new XMLImporter();
-        this.yaml = new YAMLImporter();
-        this.json = new JSONImporter();
-        setParam();
-        return json.readFile(path);
+    @Autowired
+    public ImporterBuilder(@Qualifier("XMLImporter") Importer xml, @Qualifier("YAMLImporter") Importer yaml, @Qualifier("JSONImporter") Importer json) {
+        this.xml = xml;
+        this.yaml = yaml;
+        this.json = json;
+        this.json.setNeighbour(xml);
+        this.xml.setNeighbour(yaml);
+        this.yaml.setNeighbour(null);
     }
 
-    private void setParam() {
-        json.setNeighbour(xml);
-        xml.setNeighbour(yaml);
-        yaml.setNeighbour(null);
+    public Map<String, Reactor> getData(String path) throws IOException {
+        return json.readFile(path);
     }
 }
 

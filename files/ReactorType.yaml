@@ -17,7 +17,7 @@ RBMK:
   electrical_capacity: 1000
   life_time: 40
   first_load: 192
-VVER_1000:
+VVER-1000:
   class: VVER-1200
   burnup: 40
   kpd: 0.33
@@ -89,7 +89,7 @@ PWR:
   electrical_capacity: 1150
   life_time: 50
   first_load: 74
-CPR_1000:
+CPR-1000:
   class: CPR-1000
   burnup: 52
   kpd: 35.1
@@ -116,7 +116,7 @@ PHWR:
   electrical_capacity: 742
   life_time: 60
   first_load: 38.9
-KLT_40:
+KLT-40:
   class: KLT-40
   burnup: 42
   kpd: 0.3
@@ -125,7 +125,7 @@ KLT_40:
   electrical_capacity: 32
   life_time: 36
   first_load: 0.007
-PWR_TEST:
+PWR-TEST:
   class: PWR
   burnup: 40
   kpd: 0.33

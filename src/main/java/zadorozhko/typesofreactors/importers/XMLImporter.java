@@ -1,10 +1,12 @@
 package zadorozhko.typesofreactors.importers;
 
-import zadorozhko.typesofreactors.reader.JSONReader;
+import java.io.IOException;
 import java.util.Map;
+import org.springframework.stereotype.Component;
 import zadorozhko.typesofreactors.manipulation.Reactor;
 import zadorozhko.typesofreactors.reader.XMLReader;
 
+@Component("XMLImporter")
 public class XMLImporter extends Importer {
 
     public XMLImporter() {
@@ -12,7 +14,7 @@ public class XMLImporter extends Importer {
     }
 
     @Override
-    public Map<String, Reactor> readFile(String path) {
+    public Map<String, Reactor> readFile(String path) throws IOException {
         if (path.endsWith(".xml")) {
             return this.getReader().read(path);
         }

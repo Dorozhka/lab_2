@@ -6,62 +6,30 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 
 public class Reactor {
-    @JsonProperty("sourse") private String source;
-    @JsonProperty("burnup") private double burnup;
-    @JsonProperty("class") private String rClass;
-    @JsonProperty("electrical_capacity") private double electrical_capacity;
-    @JsonProperty("enrichment") private double enrichment;
-    @JsonProperty("first_load") private double first_load;
+    @JsonProperty("class") private String classReactor;
+    @JsonProperty("burnup") private double burnUp;
     @JsonProperty("kpd") private double kpd;
-    @JsonProperty("life_time") private double life_time;
-    @JsonProperty("termal_capacity") private double termal_capacity;
+    @JsonProperty("enrichment") private double enrichment;
+    @JsonProperty("termal_capacity") private double termalCapacity;
+    @JsonProperty("electrical_capacity") private double electricalCapacity;
+    @JsonProperty("life_time") private double lifeTime;
+    @JsonProperty("first_load") private double firstLoad;
 
-    public String getSource() {
-        return source;
+
+    public String getClassReactor() {
+        return classReactor;
     }
 
-    public void setSource(String source) {
-        this.source = source;
+    public void setClassReactor(String classReactor) {
+        this.classReactor = classReactor;
     }
 
-    public double getBurnup() {
-        return burnup;
+    public double getBurnUp() {
+        return burnUp;
     }
 
-    public void setBurnup(double burnup) {
-        this.burnup = burnup;
-    }
-
-    public String getrClass() {
-        return rClass;
-    }
-
-    public void setrClass(String rClass) {
-        this.rClass = rClass;
-    }
-
-    public double getElectrical_capacity() {
-        return electrical_capacity;
-    }
-
-    public void setElectrical_capacity(double electrical_capacity) {
-        this.electrical_capacity = electrical_capacity;
-    }
-
-    public double getEnrichment() {
-        return enrichment;
-    }
-
-    public void setEnrichment(double enrichment) {
-        this.enrichment = enrichment;
-    }
-
-    public double getFirst_load() {
-        return first_load;
-    }
-
-    public void setFirst_load(double first_load) {
-        this.first_load = first_load;
+    public void setBurnUp(double burnUp) {
+        this.burnUp = burnUp;
     }
 
     public double getKpd() {
@@ -72,33 +40,66 @@ public class Reactor {
         this.kpd = kpd;
     }
 
-    public double getLife_time() {
-        return life_time;
+    public double getEnrichment() {
+        return enrichment;
     }
 
-    public void setLife_time(double life_time) {
-        this.life_time = life_time;
+    public void setEnrichment(double enrichment) {
+        this.enrichment = enrichment;
     }
 
-    public double getTermal_capacity() {
-        return termal_capacity;
+    public double getTermalCapacity() {
+        return termalCapacity;
     }
 
-    public void setTermal_capacity(double termal_capacity) {
-        this.termal_capacity = termal_capacity;
+    public void setTermalCapacity(double termalCapacity) {
+        this.termalCapacity = termalCapacity;
     }
-    
+
+    public double getElectricalCapacity() {
+        return electricalCapacity;
+    }
+
+    public void setElectricalCapacity(double electricalCapacity) {
+        this.electricalCapacity = electricalCapacity;
+    }
+
+    public double getLifeTime() {
+        return lifeTime;
+    }
+
+    public void setLifeTime(double lifeTime) {
+        this.lifeTime = lifeTime;
+    }
+
+    public double getFirstLoad() {
+        return firstLoad;
+    }
+
+    public void setFirstLoad(double firstLoad) {
+        this.firstLoad = firstLoad;
+    }
+    @Override
+    public String toString() {
+        return "class: " + classReactor + "\n"
+                + "burnup: " + burnUp + "\n"
+                + "kpd: " + kpd + "\n"
+                + "enrichment: " + enrichment + "\n"
+                + "termal_capacity: " + termalCapacity + "\n"
+                + "electrical_capacity: " + electricalCapacity + "\n"
+                + "life_time: " + lifeTime + "\n"
+                + "first_load: " + firstLoad + "\n";
+    }
     public MutableTreeNode getNode() {
-        DefaultMutableTreeNode node = new DefaultMutableTreeNode(rClass);
-        node.add(new DefaultMutableTreeNode("source: " + source));
-        node.add(new DefaultMutableTreeNode("class: " + rClass));
-        node.add(new DefaultMutableTreeNode("burnup: " + Double.toString(burnup)));
-        node.add(new DefaultMutableTreeNode("kpd: " + Double.toString(kpd)));
-        node.add(new DefaultMutableTreeNode("enrichment: " + Double.toString(enrichment)));
-        node.add(new DefaultMutableTreeNode("termal_capacity: " + Double.toString(termal_capacity)));
-        node.add(new DefaultMutableTreeNode("electrical_capacity: " + Double.toString(electrical_capacity)));
-        node.add(new DefaultMutableTreeNode("life_time: " + Double.toString(life_time)));
-        node.add(new DefaultMutableTreeNode("first_load: " + Double.toString(first_load)));
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(classReactor);
+        node.add(new DefaultMutableTreeNode("class: " + classReactor));
+        node.add(new DefaultMutableTreeNode("burnup: " + burnUp));
+        node.add(new DefaultMutableTreeNode("kpd: " + kpd));
+        node.add(new DefaultMutableTreeNode("enrichment: " + enrichment));
+        node.add(new DefaultMutableTreeNode("termal_capacity: " + termalCapacity));
+        node.add(new DefaultMutableTreeNode("electrical_capacity: " + electricalCapacity));
+        node.add(new DefaultMutableTreeNode("life_time: " + lifeTime));
+        node.add(new DefaultMutableTreeNode("first_load: " + firstLoad));
         return node;
     }
 }

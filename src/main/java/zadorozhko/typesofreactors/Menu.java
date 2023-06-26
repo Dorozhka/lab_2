@@ -4,36 +4,41 @@
  */
 package zadorozhko.typesofreactors;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
+import java.util.stream.Collectors;
+import zadorozhko.typesofreactors.db.entity.Company;
+import zadorozhko.typesofreactors.db.entity.Country;
+import zadorozhko.typesofreactors.db.entity.Site;
+import zadorozhko.typesofreactors.db.sql.DataBase;
 import zadorozhko.typesofreactors.importers.ImporterBuilder;
 import zadorozhko.typesofreactors.manipulation.DataManipulation;
-import zadorozhko.typesofreactors.manipulation.Reactor;
+import zadorozhko.typesofreactors.reader.XLSXReader;
+import zadorozhko.typesofreactors.service.ComputingService;
 
-/**
- *
- * @author Dasha
- */
+@SpringBootApplication
 public class Menu extends javax.swing.JFrame {
+    @Autowired
+    private ImporterBuilder importerBuilder;
+    @Autowired
+    private ComputingService service;
+    private boolean loadDb = false;
+    private boolean loadLibrary = false;
+    private DataManipulation dm;
+    private String fileName = null;
 
-    /**
-     * Creates new form Menu
-     */
-    
-    private JFileChooser chooser = new JFileChooser();
-    private String selectedFileName = null;
-        private DefaultMutableTreeNode addInfoToGUI(DataManipulation reactorLibrary) {
-        DefaultMutableTreeNode maintree = new DefaultMutableTreeNode("Реакторы");
-        for (Map.Entry<String, Reactor> entry : reactorLibrary.getMap().entrySet()) {
-            maintree.add(entry.getValue().getNode());
-        }
-        return maintree;
-    }
-    
-    
+
     public Menu() {
         initComponents();
     }
@@ -49,25 +54,58 @@ public class Menu extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTree1 = new javax.swing.JTree();
-        ChooseFile = new javax.swing.JButton();
-        BuildTree = new javax.swing.JButton();
+        jTable1 = new javax.swing.JTable();
+        consumptionByCountry = new javax.swing.JButton();
+        consumptionByCompany = new javax.swing.JButton();
+        consumptionByRegion = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        chooseFile = new javax.swing.JButton();
+        loadDB = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jScrollPane1.setViewportView(jTree1);
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+            },
+            new String [] {
+            }
+        ));
+        jScrollPane1.setViewportView(jTable1);
 
-        ChooseFile.setText("Выбрать файл");
-        ChooseFile.addActionListener(new java.awt.event.ActionListener() {
+        consumptionByCountry.setText("Странам");
+        consumptionByCountry.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ChooseFileActionPerformed(evt);
+                consumptionByCountryActionPerformed(evt);
             }
         });
 
-        BuildTree.setText("Построить дерево");
-        BuildTree.addActionListener(new java.awt.event.ActionListener() {
+        consumptionByCompany.setText("Компаниям");
+        consumptionByCompany.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BuildTreeActionPerformed(evt);
+                consumptionByCompanyActionPerformed(evt);
+            }
+        });
+
+        consumptionByRegion.setText("Регионам");
+        consumptionByRegion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                consumptionByRegionActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("Рассчитать суммарное потребление топлива по:");
+
+        chooseFile.setText("Выбрать файл");
+        chooseFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chooseFileActionPerformed(evt);
+            }
+        });
+
+        loadDB.setText("Загрузить в бд");
+        loadDB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadDBActionPerformed(evt);
             }
         });
 
@@ -76,27 +114,42 @@ public class Menu extends javax.swing.JFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(43, 43, 43)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(BuildTree, javax.swing.GroupLayout.DEFAULT_SIZE, 149, Short.MAX_VALUE)
-                    .addComponent(ChooseFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 88, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 765, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(21, 21, 21))
+                .addGap(15, 15, 15)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(chooseFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(loadDB, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE))
+                        .addGap(58, 58, 58)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(consumptionByCompany, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
+                            .addComponent(consumptionByCountry, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(consumptionByRegion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 355, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(22, 22, 22)
-                        .addComponent(ChooseFile, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(29, 29, 29)
-                        .addComponent(BuildTree, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 426, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(6, 6, 6)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(consumptionByCountry, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chooseFile, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addComponent(consumptionByCompany, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(consumptionByRegion, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(loadDB, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(0, 17, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -105,89 +158,175 @@ public class Menu extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(26, Short.MAX_VALUE)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void BuildTreeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BuildTreeActionPerformed
-        DataManipulation dm = null;
-        if (selectedFileName == null) {
-            JOptionPane.showMessageDialog(null, "Вы не выбрали файл");
+    private void consumptionByRegionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_consumptionByRegionActionPerformed
+        if (!loadDb) {
+            JOptionPane.showMessageDialog(null, "Вы еще не загрузили данные в БД");
             return;
         }
         try {
-            dm = new DataManipulation(selectedFileName);
-            ImporterBuilder ib = new ImporterBuilder();
-            dm.setMap(ib.getData(dm.getSource()));
-            for (Map.Entry<String, Reactor> entry : dm.getMap().entrySet()) {
-                System.out.println(entry.getValue());
+            DataBase db = new DataBase();
+            db.calculateConsumption();
+            ResultSet set = db.calculateConsumptionByRegion();
+            List<String[]> out = new ArrayList<>();
+            String[] row;
+            int i = 0;
+            while (set.next()) {
+                i++;
+                row = new String[2];
+                row[0] = set.getString(1);
+                row[1] = String.valueOf(set.getDouble(2));
+                out.add(row);
             }
-            jTree1.setModel(new DefaultTreeModel(addInfoToGUI(dm)));
+            DefaultTableModel model = new DefaultTableModel();
+            model.addColumn("Регион");
+            model.addColumn("Объем ежегодного потребления, т.");
+            for (String[] string : out) {
+                model.addRow(string);
+            }
+            jTable1.setModel(model);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }//GEN-LAST:event_consumptionByRegionActionPerformed
+
+    private void consumptionByCountryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_consumptionByCountryActionPerformed
+        if (!loadDb) {
+            JOptionPane.showMessageDialog(null, "Вы еще не загрузили данные в БД");
+            return;
+        }
+        try {
+            DataBase db = new DataBase();
+            db.calculateConsumption();
+            ResultSet set = db.calculateConsumptionByCountry();
+            List<String[]> out = new ArrayList<>();
+            String[] row;
+            int i = 0;
+            while (set.next()) {
+                i++;
+                row = new String[2];
+                row[0] = set.getString(1);
+                row[1] = String.valueOf(set.getDouble(2));
+                out.add(row);
+            }
+            DefaultTableModel model = new DefaultTableModel();
+            model.addColumn("Страна");
+            model.addColumn("Объем ежегодного потребления, т.");
+            for (String[] string : out) {
+                model.addRow(string);
+            }
+            jTable1.setModel(model);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }//GEN-LAST:event_consumptionByCountryActionPerformed
+
+    private void consumptionByCompanyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_consumptionByCompanyActionPerformed
+        if (!loadDb) {
+            JOptionPane.showMessageDialog(null, "Вы еще не загрузили данные в БД");
+            return;
+        }
+        try {
+            DataBase db = new DataBase();
+            db.calculateConsumption();
+            ResultSet set = db.calculateConsumptionByCompany();
+            List<String[]> out = new ArrayList<>();
+            String[] row;
+            int i = 0;
+            while (set.next()) {
+                i++;
+                row = new String[2];
+                row[0] = set.getString(1);
+                row[1] = String.valueOf(set.getDouble(2));
+                out.add(row);
+            }
+            DefaultTableModel model = new DefaultTableModel();
+            model.addColumn("Компания");
+            model.addColumn("Объем ежегодного потребления, т.");
+            for (String[] string : out) {
+                model.addRow(string);
+            }
+            jTable1.setModel(model);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }//GEN-LAST:event_consumptionByCompanyActionPerformed
+
+    private void chooseFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseFileActionPerformed
+        JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir") + "\\files");
+        int ret = fileChooser.showDialog(null, "Выбрать");
+        if (ret != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        fileName = fileChooser.getSelectedFile().getAbsolutePath();
+        dm = new DataManipulation(fileName);
+        try {
+            dm.setMap(importerBuilder.getData(fileName));
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Ошибка при чтении файла");
         } catch (RuntimeException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
-    }//GEN-LAST:event_BuildTreeActionPerformed
+        loadLibrary = true;
+    }//GEN-LAST:event_chooseFileActionPerformed
 
-    private void ChooseFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ChooseFileActionPerformed
-
-        chooser = new JFileChooser("C:\\Users\\Dasha\\OneDrive\\Документы\\NetBeansProjects\\TypesOfReactors\\src\\main\\java\\zadorozhko\\typesofreactors\\files");
-        int a = chooser.showDialog(null, "Выберите файл");
-        if (a != JFileChooser.APPROVE_OPTION) {
+    private void loadDBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadDBActionPerformed
+        if (!loadLibrary) {
+            JOptionPane.showMessageDialog(null, "Вы еще не выбрали файл");
             return;
         }
-        selectedFileName = chooser.getSelectedFile().getAbsolutePath();
-    }//GEN-LAST:event_ChooseFileActionPerformed
+        XLSXReader reader = new XLSXReader(System.getProperty("user.dir") + "\\files\\ReactorData.xlsx");
+        try {
+            service.createRegions(reader.readRegions("regions"));
+            Map<Long, Country> countries = service.createCountries(reader.readCountries("countries"))
+                    .stream().collect(Collectors.toMap(Country::getId, it -> it));
+            Map<Long, Company> companies = service.createCompanies(reader.readCompanies("companies", countries))
+                    .stream().collect(Collectors.toMap(Company::getId, it -> it));
+            Map<Long, Site> sites = service.createSites(reader.readSites("sites", countries, companies)).stream().collect(Collectors.toMap(Site::getId, it -> it));
+            service.createUnits(reader.readUnits("units", dm.getMap(), sites));
+        } catch (IOException | InvalidFormatException e) {
+            JOptionPane.showMessageDialog(null, "Ошибка при чтении файла");
+        }
+        loadDb = true;
+    }//GEN-LAST:event_loadDBActionPerformed
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Menu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Menu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Menu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Menu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+    public static void main(String[] args) {
+        var ctx = new SpringApplicationBuilder(Menu.class)
+                .headless(false).run(args);
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Menu().setVisible(true);
-            }
+        EventQueue.invokeLater(() -> {
+            var ex = ctx.getBean(Menu.class);
+            ex.setVisible(true);
+            var ib = ctx.getBean(ImporterBuilder.class);
+            ex.importerBuilder = ib;
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton BuildTree;
-    private javax.swing.JButton ChooseFile;
+    private javax.swing.JButton chooseFile;
+    private javax.swing.JButton consumptionByCompany;
+    private javax.swing.JButton consumptionByCountry;
+    private javax.swing.JButton consumptionByRegion;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTree jTree1;
+    private javax.swing.JTable jTable1;
+    private javax.swing.JButton loadDB;
     // End of variables declaration//GEN-END:variables
 }

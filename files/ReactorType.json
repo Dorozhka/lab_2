@@ -21,7 +21,7 @@
     "first_load": 192
   },
 
-  "VVER_1000": {
+  "VVER-1000": {
     "class": "VVER-1200",
     "burnup": 40,
     "kpd": 0.33,
@@ -109,7 +109,7 @@
     "first_load": 74.0
   },
 
-  "CPR_1000" : {
+  "CPR-1000" : {
     "class": "CPR-1000",
     "burnup": 52.0,
     "kpd": 35.1,
@@ -142,7 +142,7 @@
     "first_load": 38.9
   },
 
-  "KLT_40" : {
+  "KLT-40" : {
     "class": "KLT-40",
     "burnup": 42,
     "kpd": 0.30,
@@ -153,7 +153,7 @@
     "first_load": 0.007
   },
 
-  "PWR_TEST" : {
+  "PWR-TEST" : {
     "class": "PWR",
     "burnup": 40,
     "kpd": 0.33,
