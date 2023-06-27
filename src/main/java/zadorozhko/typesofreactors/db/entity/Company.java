@@ -25,7 +25,4 @@ public class Company {
     @ManyToOne
     @JoinColumn(name = "country_id", referencedColumnName = "id")
     private Country country;
-
-
-
 }

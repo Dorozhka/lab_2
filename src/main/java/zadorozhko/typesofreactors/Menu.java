@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.context.annotation.PropertySource;
 import zadorozhko.typesofreactors.db.entity.Company;
 import zadorozhko.typesofreactors.db.entity.Country;
 import zadorozhko.typesofreactors.db.entity.Site;
@@ -27,6 +28,7 @@ import zadorozhko.typesofreactors.manipulation.DataManipulation;
 import zadorozhko.typesofreactors.reader.XLSXReader;
 import zadorozhko.typesofreactors.service.ComputingService;
 
+@PropertySource({"application.properties"})
 @SpringBootApplication
 public class Menu extends javax.swing.JFrame {
     @Autowired
